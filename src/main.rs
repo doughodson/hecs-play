@@ -65,7 +65,7 @@ fn system_integrate_motion(world: &mut World) {
     }
 }
 
-// In this system entities find the closest entity and fire at them
+// find the closest entity and fire at them
 fn system_fire_at_closest(world: &mut World) {
     for (id0, (pos0, dmg0, kc0)) in
         &mut world.query::<With<Health, (&Position, &Damage, &mut KillCount)>>()
@@ -117,7 +117,7 @@ fn system_fire_at_closest(world: &mut World) {
 }
 
 fn system_remove_dead(world: &mut World) {
-    // Here we query entities with 0 or less hp and despawn them
+    // query entities, if less then or equal to 0 hp, save list to despawn 
     let mut to_remove: Vec<Entity> = Vec::new();
     for (id, hp) in &mut world.query::<&Health>() {
         if hp.0 <= 0 {
@@ -125,6 +125,7 @@ fn system_remove_dead(world: &mut World) {
         }
     }
 
+    // despawn entities on list
     for entity in to_remove {
         world.despawn(entity).unwrap();
     }
@@ -132,8 +133,7 @@ fn system_remove_dead(world: &mut World) {
 
 fn print_world_state(world: &mut World) {
     println!("\nEntity stats:");
-    for (id, (hp, pos, dmg, kc)) in &mut world.query::<(&Health, &Position, &Damage, &KillCount)>()
-    {
+    for (id, (hp, pos, dmg, kc)) in &mut world.query::<(&Health, &Position, &Damage, &KillCount)>() {
         println!("ID: {:?}, {:?}, {:?}, {:?}, {:?}", id, hp, dmg, pos, kc);
     }
 }
@@ -152,7 +152,7 @@ fn main() {
 
         match input.trim() {
             "" => {
-                // Run all simulation systems:
+                // execute all systems
                 system_integrate_motion(&mut world);
                 system_fire_at_closest(&mut world);
                 system_remove_dead(&mut world);
