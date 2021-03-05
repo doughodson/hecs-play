@@ -2,17 +2,18 @@ use hecs::*;
 use rand::{thread_rng, Rng};
 use std::io;
 
-/*
- Simple simulation
- Spawn multiple entities. They have health, damage, position and other components.
- On every tick every entity/unit:
-     1. Moves in random direction.
-     2. Finds closest entity to itself.
-     3. Fires at it and applies damage.
-     4. Gets damaged by other entities firing at them.
-     5. If health <= 0, the unit dies.
-State of the simulation is displayed in the sconsole through println! functions.
-*/
+//
+// Simple simulation
+// Spawn multiple entities which have health, damage, position and other components
+//
+// On every tick every entity/unit:
+//     1. Moves in random direction
+//     2. Finds closest entity to itself
+//     3. Fires at it and applies damage
+//     4. Gets damaged by other entities firing at them
+//     5. If health <= 0, the unit dies
+// State of the simulation is displayed in the console using println!
+//
 
 #[derive(Debug)]
 struct Position {
@@ -70,10 +71,7 @@ fn system_fire_at_closest(world: &mut World) {
     for (id0, (pos0, dmg0, kc0)) in
         &mut world.query::<With<Health, (&Position, &Damage, &mut KillCount)>>()
     {
-        // Find closest:
-        // Nested queries are O(n^2) and you usually want to avoid that by using some sort of
-        // spatial index like a quadtree or more general BVH, which we don't bother with here since
-        // it's out of scope for the example.
+        // find closest
         let closest = world
             .query::<With<Health, &Position>>()
             .iter()
@@ -89,17 +87,16 @@ fn system_fire_at_closest(world: &mut World) {
             }
         };
 
-        // Deal damage:
-        /*
-                // Get target unit hp like this:
-                let mut hp1 = world.query_one::<&mut Health>(closest_id.unwrap()).unwrap();
-                let hp1 = hp1.get().unwrap();
-        */
-
-        // Or like this:
+        // deal damage:
+        //
+        // get target unit hp like this:
+        //   let mut hp1 = world.query_one::<&mut Health>(closest_id.unwrap()).unwrap();
+        //   let hp1 = hp1.get().unwrap();
+        //
+        // or like this:
         let mut hp1 = world.get_mut::<Health>(closest).unwrap();
 
-        // Is target unit still alive?
+        // is target unit still alive?
         if hp1.0 > 0 {
             // apply damage
             hp1.0 -= dmg0.0;
