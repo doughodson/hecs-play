@@ -38,10 +38,10 @@ fn manhattan_dist(x0: i32, x1: i32, y0: i32, y1: i32) -> i32 {
     dx + dy
 }
 
-fn batch_spawn_entities(world: &mut World, n: usize) {
+fn spawn_entities(world: &mut World, n: usize)
+{
     let mut rng = thread_rng();
-
-    let to_spawn = (0..n).map(|_| {
+    for _ in 0..n {
         let pos = Position {
             x: rng.gen_range(-10..10),
             y: rng.gen_range(-10..10),
@@ -50,13 +50,8 @@ fn batch_spawn_entities(world: &mut World, n: usize) {
         let hp = Health(rng.gen_range(30..50));
         let dmg = Damage(rng.gen_range(1..10));
         let kc = KillCount(0);
-
-        (pos, s, hp, dmg, kc)
-    });
-
-    world.spawn_batch(to_spawn);
-    // We could instead call `world.spawn((pos, s, hp, dmg, kc))` for each entity, but `spawn_batch`
-    // is faster.
+        world.spawn((pos, s, hp, dmg, kc));
+    }
 }
 
 fn system_integrate_motion(world: &mut World) {
@@ -146,7 +141,7 @@ fn print_world_state(world: &mut World) {
 fn main() {
     let mut world = World::new();
 
-    batch_spawn_entities(&mut world, 5);
+    spawn_entities(&mut world, 5);
 
     loop {
         println!("\n'Enter' to continue simulation, '?' for enity list, 'q' to quit");
